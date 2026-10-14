@@ -2,6 +2,8 @@
 
 1. Cómo hacerlo andar
 
+Descargar como un zip y luego extraer.
+
 Necesitás el **SDK de .NET 8** ([descarga](https://dotnet.microsoft.com/download/dotnet/8.0)).
 Para comprobar que está instalado:
 
