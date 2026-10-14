@@ -1,0 +1,14 @@
+@{
+    var accion = (ViewContext.RouteData.Values["action"] ?? "").ToString();
+    string activa(string a) => accion == a ? "is-activa" : "";
+}
+<nav class="panel__nav" aria-label="Secciones del panel">
+    <a class="@activa("Index")" asp-controller="Panel" asp-action="Index">Tablero</a>
+    <a class="@activa("Productos")" asp-controller="Panel" asp-action="Productos">Productos</a>
+    <a class="@activa("Categorias")" asp-controller="Panel" asp-action="Categorias">Categorías</a>
+    <a class="@activa("Promociones")" asp-controller="Panel" asp-action="Promociones">Promociones</a>
+    <a class="@activa("Cupones")" asp-controller="Panel" asp-action="Cupones">Cupones</a>
+    <a class="@activa("Pedidos")" asp-controller="Panel" asp-action="Pedidos">Pedidos</a>
+    <a class="@activa("Usuarios")" asp-controller="Panel" asp-action="Usuarios">Usuarios</a>
+    <a asp-controller="Tienda" asp-action="Index">← Ver la tienda</a>
+</nav>

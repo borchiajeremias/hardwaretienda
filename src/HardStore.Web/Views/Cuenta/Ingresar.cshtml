@@ -1,0 +1,40 @@
+@model IngresarVm
+@{
+    ViewData["Titulo"] = "Ingresar · HardStore";
+}
+<section class="contenedor" style="padding:var(--s-7) 0;max-width:460px">
+    <div class="tarjeta">
+        <h1 class="tarjeta__titulo">Ingresar</h1>
+
+        <form class="form" method="post" asp-action="Ingresar">
+            <input type="hidden" asp-for="VolverA" />
+            <div asp-validation-summary="ModelOnly" class="form__error"></div>
+
+            <div class="campo">
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email" type="email" autocomplete="email" placeholder="tu@@email.com" />
+                <span asp-validation-for="Email" class="campo-error"></span>
+            </div>
+
+            <div class="campo">
+                <label asp-for="Password">Contraseña</label>
+                <input asp-for="Password" type="password" autocomplete="current-password" placeholder="••••••••" />
+                <span asp-validation-for="Password" class="campo-error"></span>
+            </div>
+
+            <label class="check">
+                <input asp-for="Recordarme" type="checkbox" />
+                <span>Mantenerme conectado</span>
+            </label>
+
+            <button class="btn btn--primario btn--bloque" type="submit">Ingresar</button>
+
+            <p class="form__ayuda">
+                ¿No tenés cuenta? <a asp-action="Registrarse">Creá una</a>
+            </p>
+            <p class="form__ayuda">
+                Cuenta de prueba: <code>admin@@hardstore.test</code> / <code>Admin1234</code>
+            </p>
+        </form>
+    </div>
+</section>

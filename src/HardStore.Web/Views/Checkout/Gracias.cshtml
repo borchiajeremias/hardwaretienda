@@ -1,0 +1,86 @@
+@model Pedido
+@{
+    ViewData["Titulo"] = "Pedido confirmado · HardStore";
+}
+<section class="contenedor" style="padding:var(--s-7) 0;max-width:640px">
+    <div class="tarjeta">
+        <div class="exito">
+            <div class="exito__ico" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M9 16.2l-3.5-3.5L4 14.2 9 19.2 20 8.2l-1.5-1.5z" /></svg>
+            </div>
+            <h1>¡Pedido confirmado!</h1>
+            <p>Tu código de seguimiento es <strong>@Model.Codigo</strong>.</p>
+        </div>
+
+        <div class="tabla-cont" style="margin-top:var(--s-5)">
+            <table class="tabla" style="min-width:auto">
+                <thead>
+                    <tr><th>Producto</th><th class="der">Cant.</th><th class="der">Unitario</th><th class="der">Subtotal</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var l in Model.Lineas)
+                {
+                    <tr>
+                        <td>
+                            @l.Descripcion
+                            @if (l.TienePromocion)
+                            {
+                                <br /><span class="resumen__promo">@l.PromocionAplicada · @l.UnidadesBonificadas sin cargo</span>
+                            }
+                        </td>
+                        <td class="der">@l.Cantidad</td>
+                        <td class="der">@l.PrecioUnitario.ToString("C2")</td>
+                        <td class="der">@l.Subtotal.ToString("C2")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <dl class="carrito__totales" style="margin-top:var(--s-4)">
+            <div><dt>Precio de lista</dt><dd>@Model.Bruto.ToString("C2")</dd></div>
+            @if (Model.DescuentoPromociones > 0)
+            {
+                <div><dt>Promociones</dt><dd>- @Model.DescuentoPromociones.ToString("C2")</dd></div>
+            }
+            @if (Model.DescuentoCupon > 0)
+            {
+                <div><dt>Cupón @Model.CuponCodigo</dt><dd>- @Model.DescuentoCupon.ToString("C2")</dd></div>
+            }
+            @if (Model.AjustePago != 0)
+            {
+                <div>
+                    <dt>@Model.EtiquetaPago</dt>
+                    <dd>@(Model.AjustePago > 0 ? "+ " : "- ")@Math.Abs(Model.AjustePago).ToString("C2")</dd>
+                </div>
+            }
+            <div><dt>IVA 21 % incluido</dt><dd>@Model.Iva.ToString("C2")</dd></div>
+            <div class="carrito__total"><dt>Total</dt><dd>@Model.Total.ToString("C2")</dd></div>
+        </dl>
+
+        <p class="form__ayuda">
+            Medio de pago: <strong>@Model.EtiquetaPago</strong>
+            @if (Model.Cuotas > 1)
+            {
+                <text> · @Model.Cuotas cuotas de @Model.ValorCuota.ToString("C2")</text>
+            }
+        </p>
+
+        @if (Model.Medio == MedioPago.Transferencia)
+        {
+            <div class="alerta alerta--info">
+                Te enviamos los datos bancarios a <strong>@Model.ClienteEmail</strong>.
+                El pedido queda reservado 48 horas.
+            </div>
+        }
+
+        <p style="text-align:center;margin-top:var(--s-4)">
+            <a class="btn btn--primario" asp-controller="Tienda" asp-action="Index">Seguir comprando</a>
+        </p>
+    </div>
+</section>
+
+@section Scripts {
+    @* Marca la página para que app.js vacíe el carrito local. *@
+    <script>document.body.dataset.compraConfirmada = 'true';</script>
+}

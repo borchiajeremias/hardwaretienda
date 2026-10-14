@@ -1,0 +1,50 @@
+@model IReadOnlyList<Usuario>
+@{
+    ViewData["Titulo"] = "Usuarios · Panel";
+}
+<section class="contenedor panel">
+    <h1 class="resultados__titulo">Usuarios</h1>
+    @await Html.PartialAsync("_NavPanel")
+
+    <div class="tabla-cont">
+        <table class="tabla">
+            <thead>
+                <tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Alta</th><th>Rol</th><th></th></tr>
+            </thead>
+            <tbody>
+            @foreach (var u in Model)
+            {
+                <tr>
+                    <td>@u.Nombre</td>
+                    <td>@u.Email</td>
+                    <td>@(string.IsNullOrWhiteSpace(u.Telefono) ? "—" : u.Telefono)</td>
+                    <td>@u.CreadoEn.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @if (u.EsAdmin)
+                        {
+                            <span class="pill pill--info">Administrador</span>
+                        }
+                        else
+                        {
+                            <span class="pill">Cliente</span>
+                        }
+                    </td>
+                    <td>
+                        <form method="post" asp-action="CambiarRol" asp-route-id="@u.Id">
+                            <input type="hidden" name="rol" value="@(u.EsAdmin ? "Cliente" : "Admin")" />
+                            <button class="btn btn--secundario btn--mini" type="submit">
+                                @(u.EsAdmin ? "Quitar admin" : "Hacer admin")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <p class="form__ayuda" style="text-align:left">
+        Las contraseñas se guardan con PBKDF2 (210.000 iteraciones de SHA-256 y sal por usuario):
+        no se pueden leer ni desde el panel ni desde el archivo de datos.
+    </p>
+</section>

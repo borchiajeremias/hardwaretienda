@@ -1,0 +1,228 @@
+@model CheckoutVm
+@{
+    ViewData["Titulo"] = "Finalizar compra · HardStore";
+    var c = Model.Cotizacion;
+}
+<section class="contenedor" style="padding:var(--s-6) 0">
+    <h1 class="resultados__titulo">Finalizar compra</h1>
+
+    @if (c.Avisos.Count > 0)
+    {
+        <div class="alerta alerta--error">
+            <strong>Tuvimos que ajustar tu carrito</strong>
+            <ul class="alerta__lista">
+                @foreach (var aviso in c.Avisos)
+                {
+                    <li>@aviso</li>
+                }
+            </ul>
+        </div>
+    }
+
+    @if (c.EstaVacia)
+    {
+        <p class="vacio">Tu carrito está vacío.</p>
+        <p style="text-align:center"><a class="btn btn--primario" asp-controller="Tienda" asp-action="Index">Ver catálogo</a></p>
+    }
+    else
+    {
+        <form method="post" asp-action="Confirmar" class="dos-columnas">
+            <input type="hidden" asp-for="ItemsJson" data-items-json />
+            <input type="hidden" asp-for="Cupon" />
+
+            <div class="tarjeta">
+                <h2 class="tarjeta__titulo">Tus datos</h2>
+
+                <div asp-validation-summary="All" class="form__error"></div>
+
+                <div class="form">
+                    <div class="campo">
+                        <label asp-for="Nombre">Nombre y apellido</label>
+                        <input asp-for="Nombre" autocomplete="name" />
+                        <span asp-validation-for="Nombre" class="campo-error"></span>
+                    </div>
+                    <div class="campo">
+                        <label asp-for="Email">Email</label>
+                        <input asp-for="Email" type="email" autocomplete="email" />
+                        <span asp-validation-for="Email" class="campo-error"></span>
+                    </div>
+                    <div class="campo">
+                        <label asp-for="Telefono">Teléfono</label>
+                        <input asp-for="Telefono" type="tel" autocomplete="tel" />
+                    </div>
+                    <div class="campo">
+                        <label asp-for="Direccion">Dirección de envío</label>
+                        <input asp-for="Direccion" autocomplete="street-address" />
+                    </div>
+                    <div class="campo">
+                        <label asp-for="Observaciones">Observaciones <span class="campo__opt">(opcional)</span></label>
+                        <input asp-for="Observaciones" />
+                    </div>
+                </div>
+
+                <h2 class="tarjeta__titulo" style="margin-top:var(--s-5)">Medio de pago</h2>
+
+                <div class="pagos">
+                    @foreach (var fila in Model.Comparativa)
+                    {
+                        var elegido = fila.Plan.Clave == Model.PlanPago;
+                        <label class="pago @(elegido ? "is-elegido" : "")">
+                            <input type="radio" asp-for="PlanPago" value="@fila.Plan.Clave"
+                                   checked="@elegido" data-medio="@fila.Plan.Medio" />
+                            <span class="pago__nombre">
+                                @fila.Plan.Etiqueta
+                                <span class="pago__detalle">@fila.Plan.Detalle</span>
+                            </span>
+                            <span class="pago__monto">
+                                @fila.Total.ToString("C2")
+                                @if (fila.Plan.Cuotas > 1)
+                                {
+                                    <span class="pago__cuota">@fila.Plan.Cuotas × @fila.ValorCuota.ToString("C2")</span>
+                                }
+                                @if (fila.Plan.TieneDescuento)
+                                {
+                                    <span class="pago__cuota pago__ahorro">@fila.Plan.AjustePorcentual.ToString("0.##") %</span>
+                                }
+                                else if (fila.Plan.TieneRecargo)
+                                {
+                                    <span class="pago__cuota pago__recargo">+@fila.Plan.AjustePorcentual.ToString("0.##") %</span>
+                                }
+                            </span>
+                        </label>
+                    }
+                </div>
+
+                <div class="campo" style="margin-top:var(--s-4)" data-marca-contenedor>
+                    <label asp-for="MarcaTarjeta">Marca de la tarjeta</label>
+                    <select asp-for="MarcaTarjeta" class="select">
+                        <option value="">Elegí una marca…</option>
+                        @foreach (var marca in Model.Marcas)
+                        {
+                            <option value="@marca">@marca</option>
+                        }
+                    </select>
+                    <small class="campo__hint">
+                        No pedimos número de tarjeta, vencimiento ni código de seguridad:
+                        el cobro lo haría la pasarela de pago.
+                    </small>
+                </div>
+
+                <button class="btn btn--primario btn--bloque" type="submit" style="margin-top:var(--s-4)">
+                    Confirmar pedido
+                </button>
+                <p class="form__ayuda">Demo: no se procesan pagos reales.</p>
+            </div>
+
+            <div class="tarjeta">
+                <h2 class="tarjeta__titulo">Resumen</h2>
+
+                <div class="resumen">
+                    @foreach (var l in c.Lineas)
+                    {
+                        <div class="resumen__linea">
+                            <span>
+                                @l.Cantidad × @l.Nombre
+                                @if (l.TienePromocion)
+                                {
+                                    <br /><span class="resumen__promo">
+                                        @l.PromocionEtiqueta
+                                        @if (l.UnidadesBonificadas > 0)
+                                        {
+                                            <text>· @l.UnidadesBonificadas sin cargo</text>
+                                        }
+                                    </span>
+                                }
+                            </span>
+                            <span>@l.Subtotal.ToString("C2")</span>
+                        </div>
+                    }
+
+                    <div class="resumen__linea" style="border-top:1px solid var(--c-borde);padding-top:var(--s-2)">
+                        <span>Precio de lista</span><span>@c.Bruto.ToString("C2")</span>
+                    </div>
+
+                    @if (c.TienePromociones)
+                    {
+                        <div class="resumen__linea">
+                            <span>Promociones</span>
+                            <span class="resumen__gratis">- @c.DescuentoPromociones.ToString("C2")</span>
+                        </div>
+                    }
+
+                    @if (c.TieneCupon)
+                    {
+                        <div class="resumen__linea">
+                            <span>Cupón @c.CuponCodigo</span>
+                            <span class="resumen__gratis">- @c.DescuentoCupon.ToString("C2")</span>
+                        </div>
+                    }
+
+                    @if (c.AjustePago != 0)
+                    {
+                        <div class="resumen__linea">
+                            <span>@c.Plan.Etiqueta</span>
+                            <span>@(c.AjustePago > 0 ? "+ " : "- ")@Math.Abs(c.AjustePago).ToString("C2")</span>
+                        </div>
+                    }
+
+                    <div class="resumen__linea"><span>Neto sin IVA</span><span>@c.Neto.ToString("C2")</span></div>
+                    <div class="resumen__linea"><span>IVA 21 %</span><span>@c.Iva.ToString("C2")</span></div>
+
+                    <div class="resumen__linea resumen__total" style="border-top:1px solid var(--c-borde);padding-top:var(--s-2);font-size:var(--t-lg);font-weight:800">
+                        <span>TOTAL</span><span>@c.Total.ToString("C2")</span>
+                    </div>
+
+                    @if (c.Cuotas > 1)
+                    {
+                        <p class="pago__cuota">@c.Cuotas cuotas de @c.ValorCuota.ToString("C2")</p>
+                    }
+
+                    @if (c.AhorroTotal > 0)
+                    {
+                        <p class="resumen__promo"><strong>Ahorrás @c.AhorroTotal.ToString("C2")</strong></p>
+                    }
+                </div>
+
+                <p class="form__ayuda" style="text-align:left;margin-top:var(--s-3)">
+                    Los importes se recalculan en el servidor al confirmar: lo que ves es lo que se cobra.
+                </p>
+            </div>
+        </form>
+    }
+</section>
+
+@section Scripts {
+<script>
+    // Muestra el selector de marca sólo cuando el medio elegido es con tarjeta.
+    (function () {
+        const contenedor = document.querySelector('[data-marca-contenedor]');
+        const radios = document.querySelectorAll('input[name="PlanPago"]');
+
+        function actualizar() {
+            const elegido = document.querySelector('input[name="PlanPago"]:checked');
+            const medio = elegido?.dataset.medio ?? '';
+            const conTarjeta = medio.startsWith('Tarjeta');
+            if (contenedor) contenedor.hidden = !conTarjeta;
+
+            document.querySelectorAll('.pago').forEach(function (p) {
+                p.classList.toggle('is-elegido', p.contains(elegido));
+            });
+        }
+
+        radios.forEach(function (r) {
+            r.addEventListener('change', function () {
+                actualizar();
+                // Recotizar con el nuevo medio: el total lo calcula el servidor.
+                const form = r.closest('form');
+                const items = document.querySelector('[data-items-json]')?.value ?? '[]';
+                const cupon = document.querySelector('input[name="Cupon"]')?.value ?? '';
+                const params = new URLSearchParams({ items: items, plan: r.value });
+                if (cupon) params.set('cupon', cupon);
+                window.location.href = '/Checkout/Index?' + params.toString();
+            });
+        });
+
+        actualizar();
+    })();
+</script>
+}

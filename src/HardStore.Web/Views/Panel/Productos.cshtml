@@ -1,0 +1,93 @@
+@model IReadOnlyList<Producto>
+@{
+    ViewData["Titulo"] = "Productos · Panel";
+    var categorias = ViewBag.Categorias as Dictionary<int, string> ?? new Dictionary<int, string>();
+}
+<section class="contenedor panel">
+    <h1 class="resultados__titulo">Productos</h1>
+    @await Html.PartialAsync("_NavPanel")
+
+    <div class="acciones" style="justify-content:space-between">
+        <form method="get" asp-action="Productos" class="cupon" style="max-width:360px">
+            <input class="input" type="search" name="q" placeholder="Buscar por nombre o código"
+                   value="@ViewBag.Busqueda" />
+            <button class="btn btn--secundario" type="submit">Buscar</button>
+        </form>
+        <a class="btn btn--primario" asp-action="NuevoProducto">+ Nuevo producto</a>
+    </div>
+
+    <div class="tabla-cont">
+        <table class="tabla">
+            <thead>
+                <tr>
+                    <th></th><th>Código</th><th>Producto</th><th>Categoría</th>
+                    <th class="der">Precio</th><th class="der">Stock</th><th>Estado</th><th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>
+                        <img class="tabla__mini" src="~/@(p.Imagen ?? "img/placeholder.svg")"
+                             alt="" onerror="this.src='/img/placeholder.svg'" />
+                    </td>
+                    <td><code>@p.Codigo</code></td>
+                    <td>
+                        @p.Nombre
+                        @if (p.Destacado)
+                        {
+                            <span class="pill pill--info">Destacado</span>
+                        }
+                    </td>
+                    <td>@(categorias.ContainsKey(p.CategoriaId) ? categorias[p.CategoriaId] : "—")</td>
+                    <td class="der">@p.Precio.ToString("C2")</td>
+                    <td class="der">
+                        @if (p.EstaAgotado)
+                        {
+                            <span class="pill pill--error">0</span>
+                        }
+                        else if (p.NecesitaReposicion)
+                        {
+                            <span class="pill pill--alerta">@p.Stock</span>
+                        }
+                        else
+                        {
+                            <text>@p.Stock</text>
+                        }
+                    </td>
+                    <td>
+                        @if (p.Activo)
+                        {
+                            <span class="pill pill--ok">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="pill">Inactivo</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="acciones">
+                            <a class="btn btn--secundario btn--mini" asp-action="EditarProducto" asp-route-id="@p.Id">Editar</a>
+
+                            <form method="post" asp-action="MoverStock" asp-route-id="@p.Id" class="acciones">
+                                <input type="hidden" name="accion" value="ingresar" />
+                                <input class="input input--num" type="number" name="cantidad" value="10"
+                                       min="1" style="width:70px" aria-label="Unidades a ingresar" />
+                                <button class="btn btn--secundario btn--mini" type="submit">+ Stock</button>
+                            </form>
+
+                            <form method="post" asp-action="EliminarProducto" asp-route-id="@p.Id"
+                                  onsubmit="return confirm('¿Eliminar @p.Nombre?');">
+                                <button class="btn btn--texto btn--mini" type="submit">Eliminar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <p class="form__ayuda" style="text-align:left">@Model.Count producto(s) en el catálogo.</p>
+</section>

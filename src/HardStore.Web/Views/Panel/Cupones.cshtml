@@ -1,0 +1,131 @@
+@model IReadOnlyList<Cupon>
+@{
+    ViewData["Titulo"] = "Cupones · Panel";
+}
+<section class="contenedor panel">
+    <h1 class="resultados__titulo">Códigos de descuento</h1>
+    @await Html.PartialAsync("_NavPanel")
+
+    <div class="dos-columnas">
+        <div class="tarjeta">
+            <h2 class="tarjeta__titulo">Nuevo cupón</h2>
+
+            <form method="post" asp-action="CrearCupon" class="form">
+                <div class="campo">
+                    <label for="Codigo">Código</label>
+                    <input class="input" id="Codigo" name="Codigo" required maxlength="25"
+                           placeholder="VERANO20" style="text-transform:uppercase" />
+                </div>
+
+                <div class="campo-fila">
+                    <div class="campo">
+                        <label for="Tipo">Tipo</label>
+                        <select class="select" id="Tipo" name="Tipo">
+                            <option value="Porcentaje">Porcentaje</option>
+                            <option value="MontoFijo">Monto fijo</option>
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label for="Valor">Valor</label>
+                        <input class="input input--num" id="Valor" name="Valor" type="number"
+                               step="0.01" min="0.01" value="10" required />
+                    </div>
+                </div>
+
+                <div class="campo-fila">
+                    <div class="campo">
+                        <label for="MinimoCompra">Compra mínima</label>
+                        <input class="input input--num" id="MinimoCompra" name="MinimoCompra"
+                               type="number" step="1000" min="0" value="0" />
+                    </div>
+                    <div class="campo">
+                        <label for="TopeDescuento">Tope de descuento</label>
+                        <input class="input input--num" id="TopeDescuento" name="TopeDescuento"
+                               type="number" step="1000" min="0" value="0" />
+                        <small class="campo__hint">0 = sin tope.</small>
+                    </div>
+                </div>
+
+                <div class="campo-fila">
+                    <div class="campo">
+                        <label for="Desde">Desde</label>
+                        <input class="input" id="Desde" name="Desde" type="date"
+                               value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="campo">
+                        <label for="Hasta">Hasta</label>
+                        <input class="input" id="Hasta" name="Hasta" type="date"
+                               value="@DateTime.Today.AddMonths(1).ToString("yyyy-MM-dd")" />
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label for="UsosMaximos">Usos máximos</label>
+                    <input class="input input--num" id="UsosMaximos" name="UsosMaximos"
+                           type="number" min="0" value="0" />
+                    <small class="campo__hint">0 = ilimitado.</small>
+                </div>
+
+                <div class="campo">
+                    <label for="Descripcion">Descripción</label>
+                    <input class="input" id="Descripcion" name="Descripcion" maxlength="200" />
+                </div>
+
+                <button class="btn btn--primario btn--bloque" type="submit">Crear cupón</button>
+            </form>
+        </div>
+
+        <div class="tabla-cont">
+            <table class="tabla">
+                <thead>
+                    <tr><th>Código</th><th>Descuento</th><th class="der">Mínimo</th><th class="der">Tope</th>
+                        <th class="der">Usos</th><th>Vigencia</th><th>Estado</th><th></th></tr>
+                </thead>
+                <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td><code>@c.Codigo</code></td>
+                        <td>@c.Etiqueta</td>
+                        <td class="der">@(c.MinimoCompra > 0 ? c.MinimoCompra.ToString("C0") : "—")</td>
+                        <td class="der">@(c.TopeDescuento > 0 ? c.TopeDescuento.ToString("C0") : "—")</td>
+                        <td class="der">@c.UsosRealizados / @(c.UsosMaximos == 0 ? "∞" : c.UsosMaximos.ToString())</td>
+                        <td>@c.Desde.ToString("dd/MM/yy") — @c.Hasta.ToString("dd/MM/yy")</td>
+                        <td>
+                            @if (!c.Activo)
+                            {
+                                <span class="pill">Desactivado</span>
+                            }
+                            else if (c.EstaVencido())
+                            {
+                                <span class="pill pill--alerta">Vencido</span>
+                            }
+                            else if (c.AgotoUsos)
+                            {
+                                <span class="pill pill--error">Agotado</span>
+                            }
+                            else
+                            {
+                                <span class="pill pill--ok">Activo</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="acciones">
+                                <form method="post" asp-action="AlternarCupon" asp-route-id="@c.Id">
+                                    <button class="btn btn--secundario btn--mini" type="submit">
+                                        @(c.Activo ? "Desactivar" : "Activar")
+                                    </button>
+                                </form>
+                                <form method="post" asp-action="EliminarCupon" asp-route-id="@c.Id"
+                                      onsubmit="return confirm('¿Eliminar el cupón @c.Codigo?');">
+                                    <button class="btn btn--texto btn--mini" type="submit">Eliminar</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

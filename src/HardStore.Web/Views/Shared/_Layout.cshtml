@@ -1,0 +1,169 @@
+@using System.Security.Claims
+@inject CatalogoServicio Catalogo
+@{
+    var esAdmin = User.IsInRole("Admin");
+    var nombre = User.FindFirst(ClaimTypes.Name)?.Value;
+    var primerNombre = nombre?.Split(' ').FirstOrDefault();
+    var categorias = Catalogo.CategoriasConTotales();
+    var slugActual = Context.Request.Query["categoria"].ToString();
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="HardStore — componentes de PC, periféricos y equipos armados." />
+    <meta name="theme-color" content="#0b1120" />
+    <title>@(ViewData["Titulo"] ?? "HardStore · Hardware, periféricos y PCs armadas")</title>
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <link rel="icon" href="~/img/favicon.svg" type="image/svg+xml" />
+</head>
+<body>
+@Html.AntiForgeryToken()
+
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<div class="topbar">
+    <div class="contenedor topbar__inner">
+        <span>Envíos a todo el país · 3 cuotas sin interés · 10 % por transferencia</span>
+        <span class="topbar__tel">0800-333-HARD</span>
+    </div>
+</div>
+
+<header class="header">
+    <div class="contenedor header__inner">
+        <a class="logo" asp-controller="Tienda" asp-action="Index" aria-label="HardStore, inicio">
+            <svg class="logo__ico" viewBox="0 0 32 32" aria-hidden="true">
+                <rect x="3" y="3" width="26" height="26" rx="6" />
+                <rect x="10" y="10" width="12" height="12" rx="2" class="logo__chip" />
+                <path d="M16 3v4M16 25v4M3 16h4M25 16h4" class="logo__pins" />
+            </svg>
+            <span class="logo__texto">Hard<strong>Store</strong></span>
+        </a>
+
+        <form class="buscador" role="search" asp-controller="Tienda" asp-action="Index" method="get">
+            <label class="sr-only" for="q">Buscar productos</label>
+            <svg class="buscador__ico" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10 4a6 6 0 104 10.5l4.3 4.3 1.4-1.4-4.3-4.3A6 6 0 0010 4zm0 2a4 4 0 110 8 4 4 0 010-8z" />
+            </svg>
+            <input type="search" id="q" name="q" class="buscador__input"
+                   placeholder="Buscar procesadores, placas de video, SSD…"
+                   value="@Context.Request.Query["q"]" autocomplete="off" />
+            <button class="buscador__btn" type="submit">Buscar</button>
+        </form>
+
+        <div class="header__acciones">
+            @if (esAdmin)
+            {
+                <a class="btn-icono" asp-controller="Panel" asp-action="Index">
+                    <span class="btn-icono__txt">Panel</span>
+                </a>
+            }
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a class="btn-icono" asp-controller="Cuenta" asp-action="MisPedidos">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" class="ico"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" /></svg>
+                    <span class="btn-icono__txt">@primerNombre</span>
+                </a>
+                <form asp-controller="Cuenta" asp-action="Salir" method="post" style="display:inline">
+                    <button class="btn btn--texto btn--mini" type="submit">Salir</button>
+                </form>
+            }
+            else
+            {
+                <a class="btn-icono" asp-controller="Cuenta" asp-action="Ingresar"
+                   asp-route-volverA="@Context.Request.Path">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" class="ico"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z" /></svg>
+                    <span class="btn-icono__txt">Ingresar</span>
+                </a>
+            }
+
+            <button class="btn-carrito" type="button" data-abrir-carrito aria-label="Abrir carrito">
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="ico"><path d="M7 4h-3v2h2l2.6 9.6c.2.8.9 1.4 1.8 1.4h8.4v-2h-8.2L10 13h9l2-8H6.4L7 4zm2 15a1.8 1.8 0 100 3.6A1.8 1.8 0 009 19zm9 0a1.8 1.8 0 100 3.6A1.8 1.8 0 0018 19z" /></svg>
+                <span class="btn-carrito__txt">Carrito</span>
+                <span class="badge" data-carrito-contador hidden>0</span>
+            </button>
+        </div>
+    </div>
+
+    <nav class="nav" aria-label="Categorías">
+        <div class="contenedor nav__inner">
+            <a class="nav__link @(string.IsNullOrEmpty(slugActual) ? "is-activa" : "")"
+               asp-controller="Tienda" asp-action="Index">Todos los productos</a>
+            @foreach (var (categoria, cantidad) in categorias)
+            {
+                <a class="nav__link @(slugActual == categoria.Slug ? "is-activa" : "")"
+                   asp-controller="Tienda" asp-action="Index" asp-route-categoria="@categoria.Slug">
+                    @categoria.Nombre <span class="nav__cant">@cantidad</span>
+                </a>
+            }
+        </div>
+    </nav>
+</header>
+
+<main id="contenido">
+    <div class="contenedor">
+        @if (TempData["Exito"] is string exito)
+        {
+            <div class="alerta alerta--exito"><strong>@exito</strong></div>
+        }
+        @if (TempData["Error"] is string error)
+        {
+            <div class="alerta alerta--error"><strong>@error</strong></div>
+        }
+        @if (TempData["Info"] is string info)
+        {
+            <div class="alerta alerta--info">@info</div>
+        }
+    </div>
+
+    @RenderBody()
+</main>
+
+<footer class="footer">
+    <div class="contenedor footer__grid">
+        <div>
+            <h3 class="footer__titulo">Hard<strong>Store</strong></h3>
+            <p class="footer__texto">Componentes, periféricos y equipos armados. Garantía oficial y armado sin cargo.</p>
+        </div>
+        <div>
+            <h4 class="footer__sub">Medios de pago</h4>
+            <ul class="footer__lista">
+                <li>Transferencia · 10 % OFF</li>
+                <li>Efectivo · 10 % OFF</li>
+                <li>Débito y crédito</li>
+                <li>Hasta 12 cuotas</li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="footer__sub">Ayuda</h4>
+            <ul class="footer__lista">
+                <li>Envíos y retiros</li>
+                <li>Garantía y devoluciones</li>
+                <li>ventas@@hardstore.test</li>
+            </ul>
+        </div>
+        <div>
+            <h4 class="footer__sub">Contacto</h4>
+            <ul class="footer__lista">
+                <li>Av. Siempreviva 742, CABA</li>
+                <li>Lun a Vie 9 a 19 · Sáb 9 a 13</li>
+                <li>0800-333-HARD</li>
+            </ul>
+        </div>
+    </div>
+    <div class="contenedor footer__legal">
+        <p>© @DateTime.Now.Year HardStore. Precios en pesos argentinos con IVA incluido.</p>
+        <p>ASP.NET Core 8 · MVC · Demo: no se procesan pagos reales.</p>
+    </div>
+</footer>
+
+@await Html.PartialAsync("_Carrito")
+
+<div class="toasts" data-toasts aria-live="polite"></div>
+
+<script type="module" src="~/js/app.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

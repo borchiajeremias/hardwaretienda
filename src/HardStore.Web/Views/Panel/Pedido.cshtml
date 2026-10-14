@@ -1,0 +1,71 @@
+@model Pedido
+@{
+    ViewData["Titulo"] = Model.Codigo + " · Panel";
+}
+<section class="contenedor panel">
+    <h1 class="resultados__titulo">Pedido @Model.Codigo</h1>
+    @await Html.PartialAsync("_NavPanel")
+
+    <div class="dos-columnas">
+        <div class="tarjeta">
+            <h2 class="tarjeta__titulo">Cliente</h2>
+            <dl class="carrito__totales">
+                <div><dt>Nombre</dt><dd>@Model.ClienteNombre</dd></div>
+                <div><dt>Email</dt><dd>@Model.ClienteEmail</dd></div>
+                <div><dt>Teléfono</dt><dd>@(string.IsNullOrWhiteSpace(Model.ClienteTelefono) ? "—" : Model.ClienteTelefono)</dd></div>
+                <div><dt>Dirección</dt><dd>@(string.IsNullOrWhiteSpace(Model.DireccionEnvio) ? "—" : Model.DireccionEnvio)</dd></div>
+                <div><dt>Fecha</dt><dd>@Model.CreadoEn.ToString("dd/MM/yyyy HH:mm")</dd></div>
+                <div><dt>Medio de pago</dt><dd>@Model.EtiquetaPago</dd></div>
+                <div><dt>Estado</dt><dd>@Model.Estado</dd></div>
+            </dl>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Observaciones))
+            {
+                <p class="card__desc"><strong>Observaciones:</strong> @Model.Observaciones</p>
+            }
+        </div>
+
+        <div>
+            <div class="tabla-cont">
+                <table class="tabla">
+                    <thead>
+                        <tr><th>Código</th><th>Producto</th><th class="der">Cant.</th>
+                            <th class="der">Unitario</th><th>Promo</th><th class="der">Subtotal</th></tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var l in Model.Lineas)
+                    {
+                        <tr>
+                            <td><code>@l.Codigo</code></td>
+                            <td>@l.Descripcion</td>
+                            <td class="der">@l.Cantidad</td>
+                            <td class="der">@l.PrecioUnitario.ToString("C2")</td>
+                            <td>
+                                @if (l.TienePromocion)
+                                {
+                                    <span class="pill pill--ok">@l.UnidadesBonificadas sin cargo</span>
+                                    <br /><small class="card__marca">@l.PromocionAplicada</small>
+                                }
+                                else
+                                {
+                                    <text>—</text>
+                                }
+                            </td>
+                            <td class="der">@l.Subtotal.ToString("C2")</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            <dl class="carrito__totales" style="margin-top:var(--s-4)">
+                <div><dt>Precio de lista</dt><dd>@Model.Bruto.ToString("C2")</dd></div>
+                <div><dt>Promociones</dt><dd>- @Model.DescuentoPromociones.ToString("C2")</dd></div>
+                <div><dt>Cupón @(Model.CuponCodigo ?? "—")</dt><dd>- @Model.DescuentoCupon.ToString("C2")</dd></div>
+                <div><dt>@Model.EtiquetaPago</dt><dd>@(Model.AjustePago >= 0 ? "+ " : "- ")@Math.Abs(Model.AjustePago).ToString("C2")</dd></div>
+                <div><dt>IVA incluido</dt><dd>@Model.Iva.ToString("C2")</dd></div>
+                <div class="carrito__total"><dt>Total</dt><dd>@Model.Total.ToString("C2")</dd></div>
+            </dl>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Proyecto de pruebas SIN dependencias externas.
+
+    ¿Por qué no xUnit? Porque xUnit se baja de NuGet, y así el proyecto se
+    puede compilar y verificar en una máquina sin internet o detrás de un
+    proxy que bloquee el feed. El corredor de pruebas está en Corredor.cs y
+    son unas 60 líneas: alcanza de sobra para lo que hay que verificar acá.
+
+        dotnet run  (con la opcion de proyecto) tests/HardStore.Pruebas
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>HardStore.Pruebas</RootNamespace>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\HardStore.Web\HardStore.Web.csproj" />
+  </ItemGroup>
+
+</Project>

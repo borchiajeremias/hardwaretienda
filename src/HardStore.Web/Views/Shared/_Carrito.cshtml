@@ -1,0 +1,71 @@
+@{
+    var planes = PlanesPago.Todos;
+}
+<div class="overlay" data-overlay hidden></div>
+
+<aside class="carrito" data-carrito role="dialog" aria-modal="true" aria-labelledby="carrito-titulo" hidden>
+    <header class="carrito__header">
+        <h2 class="carrito__titulo" id="carrito-titulo">Tu carrito</h2>
+        <button class="btn-cerrar" type="button" data-cerrar-carrito aria-label="Cerrar carrito">&times;</button>
+    </header>
+
+    <div class="carrito__items" data-carrito-items hidden></div>
+
+    <div class="carrito__vacio" data-carrito-vacio>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h-3v2h2l2.6 9.6c.2.8.9 1.4 1.8 1.4h8.4v-2h-8.2L10 13h9l2-8H6.4L7 4z" /></svg>
+        <p>Todavía no agregaste productos.</p>
+        <button class="btn btn--secundario" type="button" data-cerrar-carrito>Ver catálogo</button>
+    </div>
+
+    <footer class="carrito__footer" data-carrito-footer hidden>
+        <div>
+            <div class="cupon" data-cupon-form>
+                <input class="input" type="text" placeholder="Código de descuento"
+                       data-cupon-input maxlength="25" aria-label="Código de descuento" />
+                <button class="btn btn--secundario" type="button" data-aplicar-cupon>Aplicar</button>
+            </div>
+            <div class="cupon__aplicado" data-cupon-aplicado hidden>
+                <span data-cupon-codigo></span>
+                <button class="btn btn--texto btn--mini" type="button" data-quitar-cupon>Quitar</button>
+            </div>
+        </div>
+
+        <details>
+            <summary style="cursor:pointer;font-size:var(--t-sm);font-weight:600;padding:var(--s-2) 0">
+                Medio de pago
+            </summary>
+            <div class="pagos" style="margin-top:var(--s-2)">
+                @foreach (var plan in planes)
+                {
+                    <label class="pago" data-plan="@plan.Clave">
+                        <input type="radio" name="planCarrito" value="@plan.Clave"
+                               checked="@(plan.Clave == PlanesPago.PorDefecto.Clave)" />
+                        <span class="pago__nombre">
+                            @plan.Etiqueta
+                            <span class="pago__detalle">@plan.Detalle</span>
+                        </span>
+                        <span class="pago__monto">
+                            <span data-plan-total></span>
+                            <span class="pago__cuota" data-plan-cuota hidden></span>
+                        </span>
+                    </label>
+                }
+            </div>
+        </details>
+
+        <dl class="carrito__totales">
+            <div><dt>Precio de lista</dt><dd data-total-bruto>$ 0,00</dd></div>
+            <div data-fila-promos hidden><dt>Promociones</dt><dd data-total-promos>$ 0,00</dd></div>
+            <div data-fila-cupon hidden><dt>Cupón</dt><dd data-total-cupon>$ 0,00</dd></div>
+            <div data-fila-pago hidden><dt>Medio de pago</dt><dd data-total-pago>$ 0,00</dd></div>
+            <div><dt>IVA incluido</dt><dd data-total-iva>$ 0,00</dd></div>
+            <div class="carrito__total"><dt>Total</dt><dd data-total-final>$ 0,00</dd></div>
+        </dl>
+
+        <p class="resumen__promo" data-ahorro hidden></p>
+        <p class="pago__cuota" data-cuotas hidden></p>
+
+        <button class="btn btn--primario btn--bloque" type="button" data-ir-checkout>Finalizar compra</button>
+        <button class="btn btn--texto btn--bloque" type="button" data-vaciar-carrito>Vaciar carrito</button>
+    </footer>
+</aside>

@@ -1,0 +1,94 @@
+@model PanelVm
+@{
+    ViewData["Titulo"] = "Panel · HardStore";
+    decimal M(string k) => Model.Metricas.TryGetValue(k, out var v) ? v : 0m;
+}
+<section class="contenedor panel">
+    <h1 class="resultados__titulo">Panel de administración</h1>
+    @await Html.PartialAsync("_NavPanel")
+
+    <div class="metricas">
+        <div class="metrica"><span class="metrica__valor">@M("productos")</span><span class="metrica__nombre">Productos activos</span></div>
+        <div class="metrica @(M("agotados") > 0 ? "metrica--alerta" : "")"><span class="metrica__valor">@M("agotados")</span><span class="metrica__nombre">Agotados</span></div>
+        <div class="metrica"><span class="metrica__valor">@M("aReponer")</span><span class="metrica__nombre">A reponer</span></div>
+        <div class="metrica"><span class="metrica__valor">@M("inventario").ToString("C0")</span><span class="metrica__nombre">Inventario valorizado</span></div>
+        <div class="metrica"><span class="metrica__valor">@M("pedidos")</span><span class="metrica__nombre">Pedidos</span></div>
+        <div class="metrica metrica--ok"><span class="metrica__valor">@M("facturado").ToString("C0")</span><span class="metrica__nombre">Facturado</span></div>
+        <div class="metrica"><span class="metrica__valor">@M("ticket").ToString("C0")</span><span class="metrica__nombre">Ticket promedio</span></div>
+        <div class="metrica"><span class="metrica__valor">@Model.Promociones</span><span class="metrica__nombre">Promos vigentes</span></div>
+    </div>
+
+    <div class="dos-columnas">
+        <div class="tarjeta">
+            <h2 class="tarjeta__titulo">A reponer</h2>
+            @if (Model.AReponer.Count == 0)
+            {
+                <p class="card__desc">Ningún producto está por debajo de su mínimo.</p>
+            }
+            else
+            {
+                <div class="tabla-cont">
+                    <table class="tabla" style="min-width:auto">
+                        <thead><tr><th>Producto</th><th class="der">Stock</th><th class="der">Mínimo</th></tr></thead>
+                        <tbody>
+                        @foreach (var p in Model.AReponer)
+                        {
+                            <tr>
+                                <td>@p.Nombre</td>
+                                <td class="der">
+                                    @if (p.EstaAgotado)
+                                    {
+                                        <span class="pill pill--error">0</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="pill pill--alerta">@p.Stock</span>
+                                    }
+                                </td>
+                                <td class="der">@p.StockMinimo</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <div class="tarjeta">
+            <h2 class="tarjeta__titulo">Últimos pedidos</h2>
+            @if (Model.UltimosPedidos.Count == 0)
+            {
+                <p class="card__desc">Todavía no hay pedidos.</p>
+            }
+            else
+            {
+                <div class="tabla-cont">
+                    <table class="tabla" style="min-width:auto">
+                        <thead><tr><th>Código</th><th>Cliente</th><th>Pago</th><th class="der">Total</th><th>Estado</th></tr></thead>
+                        <tbody>
+                        @foreach (var p in Model.UltimosPedidos)
+                        {
+                            <tr>
+                                <td><a asp-action="Pedido" asp-route-id="@p.Id">@p.Codigo</a></td>
+                                <td>@p.ClienteNombre</td>
+                                <td>@p.EtiquetaPago</td>
+                                <td class="der">@p.Total.ToString("C2")</td>
+                                <td>
+                                    @if (p.EstaCancelado)
+                                    {
+                                        <span class="pill pill--error">Cancelado</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="pill pill--info">@p.Estado</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</section>

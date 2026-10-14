@@ -1,0 +1,169 @@
+@model CatalogoVm
+@{
+    ViewData["Titulo"] = "HardStore · Hardware, periféricos y PCs armadas";
+}
+
+<section class="hero">
+    <div class="contenedor hero__inner">
+        <div class="hero__texto">
+            <p class="hero__kicker">Nueva generación AM5 · DDR5 · PCIe 5.0</p>
+            <h1 class="hero__titulo">Armá la PC que siempre quisiste</h1>
+            <p class="hero__bajada">
+                Componentes con garantía oficial y armado sin cargo. Aprovechá el 3x2 en SSD,
+                el 2x1 en memorias y hasta 12 cuotas con tarjeta.
+            </p>
+            <div class="hero__acciones">
+                <a class="btn btn--primario" href="#catalogo">Ver catálogo</a>
+                <a class="btn btn--fantasma" asp-action="Index" asp-route-categoria="equipos-armados">Equipos armados</a>
+            </div>
+        </div>
+        <ul class="hero__beneficios">
+            <li><strong>10 %</strong><span>por transferencia</span></li>
+            <li><strong>3</strong><span>cuotas sin interés</span></li>
+            <li><strong>24h</strong><span>despacho promedio</span></li>
+        </ul>
+    </div>
+</section>
+
+<section class="catalogo contenedor" id="catalogo">
+    <aside class="filtros" aria-label="Filtros">
+        <form class="filtros__form" method="get" asp-action="Index">
+            <div class="filtros__grupo">
+                <h2 class="filtros__titulo">Categoría</h2>
+                <select class="select" name="categoria">
+                    <option value="">Todas las categorías</option>
+                    @foreach (var par in Model.Categorias)
+                    {
+                        <option value="@par.Categoria.Slug" selected="@(Model.CategoriaSlug == par.Categoria.Slug)">
+                            @par.Categoria.Nombre (@par.Cantidad)
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="filtros__grupo">
+                <h2 class="filtros__titulo">Precio</h2>
+                <div class="filtros__precio">
+                    <input type="number" name="min" class="input input--num" placeholder="Mín."
+                           min="0" step="1000" value="@Model.PrecioMin" aria-label="Precio mínimo" />
+                    <span aria-hidden="true">—</span>
+                    <input type="number" name="max" class="input input--num" placeholder="Máx."
+                           min="0" step="1000" value="@Model.PrecioMax" aria-label="Precio máximo" />
+                </div>
+                <p class="filtros__nota">
+                    Catálogo: @Model.PrecioMinimoCatalogo.ToString("C2") a @Model.PrecioMaximoCatalogo.ToString("C2")
+                </p>
+            </div>
+
+            <div class="filtros__grupo">
+                <h2 class="filtros__titulo">Ordenar por</h2>
+                <select class="select" name="orden">
+                    <option value="destacados" selected="@(Model.Orden == "destacados")">Destacados</option>
+                    <option value="nuevos" selected="@(Model.Orden == "nuevos")">Más nuevos</option>
+                    <option value="precio_asc" selected="@(Model.Orden == "precio_asc")">Menor precio</option>
+                    <option value="precio_desc" selected="@(Model.Orden == "precio_desc")">Mayor precio</option>
+                    <option value="nombre" selected="@(Model.Orden == "nombre")">Nombre (A-Z)</option>
+                </select>
+            </div>
+
+            <div class="filtros__grupo">
+                <label class="check">
+                    <input type="checkbox" name="soloStock" value="true" checked="@Model.SoloConStock" />
+                    <span>Sólo con stock disponible</span>
+                </label>
+            </div>
+
+            <input type="hidden" name="q" value="@Model.Busqueda" />
+            <button class="btn btn--primario btn--bloque" type="submit">Aplicar filtros</button>
+            <a class="btn btn--texto btn--bloque" asp-action="Index">Limpiar filtros</a>
+        </form>
+    </aside>
+
+    <div class="resultados">
+        <header class="resultados__header">
+            <h2 class="resultados__titulo">
+                @if (!string.IsNullOrWhiteSpace(Model.Busqueda))
+                {
+                    <text>Resultados para “@Model.Busqueda”</text>
+                }
+                else
+                {
+                    <text>Todos los productos</text>
+                }
+            </h2>
+            <p class="resultados__conteo">@Model.Total producto@(Model.Total == 1 ? "" : "s")</p>
+        </header>
+
+        <div class="grid">
+            @foreach (var p in Model.Productos)
+            {
+                <article class="card">
+                    <div class="card__media">
+                        <img class="card__img" src="~/@(p.Imagen ?? "img/placeholder.svg")"
+                             alt="@p.Nombre" loading="lazy" width="320" height="240"
+                             onerror="this.src='/img/placeholder.svg'" />
+                        @if (p.Destacado)
+                        {
+                            <span class="etiqueta etiqueta--destacado">Destacado</span>
+                        }
+                        @if (Model.Promociones.ContainsKey(p.Id))
+                        {
+                            <span class="etiqueta etiqueta--promo">@Model.Promociones[p.Id]</span>
+                        }
+                        @if (p.EstaAgotado)
+                        {
+                            <span class="etiqueta etiqueta--agotado">Sin stock</span>
+                        }
+                        else if (p.Stock <= 5)
+                        {
+                            <span class="etiqueta etiqueta--ultimos">Últimas @p.Stock</span>
+                        }
+                    </div>
+                    <div class="card__cuerpo">
+                        <p class="card__categoria">
+                            @(Model.NombresCategoria.ContainsKey(p.CategoriaId) ? Model.NombresCategoria[p.CategoriaId] : "")
+                        </p>
+                        <h3 class="card__nombre">
+                            <a asp-action="Detalle" asp-route-id="@p.Id" style="color:inherit">@p.Nombre</a>
+                        </h3>
+                        <p class="card__marca">@p.Marca</p>
+                        <p class="card__desc">@p.Descripcion</p>
+                        <div class="card__pie">
+                            <p class="card__precio">@p.Precio.ToString("C2")</p>
+                            <button class="btn btn--primario card__btn" type="button"
+                                    data-agregar="@p.Id" data-nombre="@p.Nombre"
+                                    disabled="@p.EstaAgotado">
+                                @(p.EstaAgotado ? "Sin stock" : "Agregar")
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+
+        @if (Model.Total == 0)
+        {
+            <p class="vacio">No encontramos productos con esos filtros.</p>
+        }
+
+        @if (Model.Paginas > 1)
+        {
+            <nav class="paginacion" aria-label="Paginación">
+                @for (var i = 1; i <= Model.Paginas; i++)
+                {
+                    <a class="paginacion__btn" aria-current="@(i == Model.Pagina ? "page" : null)"
+                       asp-action="Index" asp-route-pagina="@i" asp-route-categoria="@Model.CategoriaSlug"
+                       asp-route-q="@Model.Busqueda" asp-route-orden="@Model.Orden">@i</a>
+                }
+            </nav>
+        }
+    </div>
+</section>
+
+<section class="franja">
+    <div class="contenedor franja__grid">
+        <div class="franja__item"><h3>3x2 en SSD Kingston</h3><p>Llevás tres y pagás dos. La promo se aplica sola en el carrito.</p></div>
+        <div class="franja__item"><h3>10 % por transferencia</h3><p>El descuento se calcula sobre el total ya promocionado.</p></div>
+        <div class="franja__item"><h3>Cupones de descuento</h3><p>Probá BIENVENIDO10 en el carrito.</p></div>
+    </div>
+</section>

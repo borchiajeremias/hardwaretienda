@@ -1,0 +1,53 @@
+@model RegistrarseVm
+@{
+    ViewData["Titulo"] = "Crear cuenta · HardStore";
+}
+<section class="contenedor" style="padding:var(--s-7) 0;max-width:560px">
+    <div class="tarjeta">
+        <h1 class="tarjeta__titulo">Crear cuenta</h1>
+
+        <form class="form" method="post" asp-action="Registrarse">
+            <div asp-validation-summary="ModelOnly" class="form__error"></div>
+
+            <div class="campo">
+                <label asp-for="Nombre">Nombre y apellido</label>
+                <input asp-for="Nombre" autocomplete="name" />
+                <span asp-validation-for="Nombre" class="campo-error"></span>
+            </div>
+
+            <div class="campo">
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email" type="email" autocomplete="email" />
+                <span asp-validation-for="Email" class="campo-error"></span>
+            </div>
+
+            <div class="campo-fila">
+                <div class="campo">
+                    <label asp-for="Password">Contraseña</label>
+                    <input asp-for="Password" type="password" autocomplete="new-password" />
+                    <small class="campo__hint">Mínimo 8 caracteres, con letras y números.</small>
+                    <span asp-validation-for="Password" class="campo-error"></span>
+                </div>
+                <div class="campo">
+                    <label asp-for="PasswordRepetida">Repetir contraseña</label>
+                    <input asp-for="PasswordRepetida" type="password" autocomplete="new-password" />
+                    <span asp-validation-for="PasswordRepetida" class="campo-error"></span>
+                </div>
+            </div>
+
+            <div class="campo-fila">
+                <div class="campo">
+                    <label asp-for="Telefono">Teléfono <span class="campo__opt">(opcional)</span></label>
+                    <input asp-for="Telefono" type="tel" autocomplete="tel" />
+                </div>
+                <div class="campo">
+                    <label asp-for="Direccion">Dirección <span class="campo__opt">(opcional)</span></label>
+                    <input asp-for="Direccion" autocomplete="street-address" />
+                </div>
+            </div>
+
+            <button class="btn btn--primario btn--bloque" type="submit">Crear cuenta</button>
+            <p class="form__ayuda">¿Ya tenés cuenta? <a asp-action="Ingresar">Ingresá</a></p>
+        </form>
+    </div>
+</section>

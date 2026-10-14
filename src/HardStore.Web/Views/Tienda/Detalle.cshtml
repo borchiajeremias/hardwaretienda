@@ -1,0 +1,93 @@
+@model Producto
+@{
+    ViewData["Titulo"] = Model.Nombre + " · HardStore";
+    var promociones = ViewBag.Promociones as IReadOnlyList<Promocion> ?? new List<Promocion>();
+    var planes = ViewBag.Planes as IReadOnlyList<PlanPago> ?? PlanesPago.Todos;
+}
+
+<section class="contenedor" style="padding:var(--s-6) 0">
+    <div class="dos-columnas">
+        <div>
+            <img class="card__img" style="border-radius:var(--r-md);border:1px solid var(--c-borde)"
+                 src="~/@(Model.Imagen ?? "img/placeholder.svg")" alt="@Model.Nombre"
+                 onerror="this.src='/img/placeholder.svg'" />
+        </div>
+
+        <div>
+            <p class="card__categoria">@ViewBag.Categoria</p>
+            <h1 class="resultados__titulo" style="font-size:var(--t-2xl)">@Model.Nombre</h1>
+            <p class="card__marca">@Model.Marca · Código @Model.Codigo</p>
+
+            <p style="font-size:var(--t-2xl);font-weight:800;margin:var(--s-4) 0">@Model.Precio.ToString("C2")</p>
+
+            @if (promociones.Count > 0)
+            {
+                <div class="alerta alerta--exito">
+                    <strong>Promociones vigentes</strong>
+                    <ul class="alerta__lista">
+                        @foreach (var promo in promociones)
+                        {
+                            <li>@promo.Etiqueta — @promo.Nombre (hasta el @promo.Hasta.ToString("dd/MM/yyyy"))</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <p class="card__desc" style="font-size:var(--t-md)">@Model.Descripcion</p>
+
+            <p>
+                @if (Model.EstaAgotado)
+                {
+                    <span class="pill pill--error">Sin stock</span>
+                }
+                else if (Model.NecesitaReposicion)
+                {
+                    <span class="pill pill--alerta">Últimas @Model.Stock unidades</span>
+                }
+                else
+                {
+                    <span class="pill pill--ok">@Model.Stock en stock</span>
+                }
+            </p>
+
+            <div class="hero__acciones">
+                <button class="btn btn--primario" type="button"
+                        data-agregar="@Model.Id" data-nombre="@Model.Nombre" disabled="@Model.EstaAgotado">
+                    @(Model.EstaAgotado ? "Sin stock" : "Agregar al carrito")
+                </button>
+                <a class="btn btn--fantasma" asp-action="Index">Volver al catálogo</a>
+            </div>
+
+            <div class="tarjeta" style="margin-top:var(--s-5)">
+                <h2 class="tarjeta__titulo">Medios de pago</h2>
+                <div class="tabla-cont">
+                    <table class="tabla" style="min-width:auto">
+                        <thead><tr><th>Forma de pago</th><th class="der">Total</th><th class="der">Cuota</th></tr></thead>
+                        <tbody>
+                        @foreach (var plan in planes)
+                        {
+                            <tr>
+                                <td>@plan.Etiqueta</td>
+                                <td class="der">@plan.TotalSobre(Model.Precio).ToString("C2")</td>
+                                <td class="der">
+                                    @if (plan.Cuotas > 1)
+                                    {
+                                        <text>@plan.Cuotas × @plan.ValorCuota(Model.Precio).ToString("C2")</text>
+                                    }
+                                    else
+                                    {
+                                        <text>—</text>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                <p class="form__ayuda" style="text-align:left;margin-top:var(--s-2)">
+                    No pedimos datos de tarjeta: el cobro lo haría la pasarela de pago.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>

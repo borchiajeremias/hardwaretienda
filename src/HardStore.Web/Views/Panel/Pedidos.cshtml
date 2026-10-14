@@ -1,0 +1,68 @@
+@model IReadOnlyList<Pedido>
+@{
+    ViewData["Titulo"] = "Pedidos · Panel";
+    var estados = new[] { EstadoPedido.Pendiente, EstadoPedido.Pagado, EstadoPedido.Enviado, EstadoPedido.Entregado };
+}
+<section class="contenedor panel">
+    <h1 class="resultados__titulo">Pedidos</h1>
+    @await Html.PartialAsync("_NavPanel")
+
+    @if (Model.Count == 0)
+    {
+        <p class="vacio">Todavía no se registró ningún pedido.</p>
+    }
+    else
+    {
+        <div class="tabla-cont">
+            <table class="tabla">
+                <thead>
+                    <tr><th>Código</th><th>Fecha</th><th>Cliente</th><th>Pago</th>
+                        <th class="der">Total</th><th>Estado</th><th>Acciones</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td><a asp-action="Pedido" asp-route-id="@p.Id"><strong>@p.Codigo</strong></a></td>
+                        <td>@p.CreadoEn.ToString("dd/MM/yy HH:mm")</td>
+                        <td>@p.ClienteNombre<br /><small class="card__marca">@p.ClienteEmail</small></td>
+                        <td>@p.EtiquetaPago</td>
+                        <td class="der">@p.Total.ToString("C2")</td>
+                        <td>
+                            @if (p.EstaCancelado)
+                            {
+                                <span class="pill pill--error">Cancelado</span>
+                            }
+                            else
+                            {
+                                <span class="pill pill--info">@p.Estado</span>
+                            }
+                        </td>
+                        <td>
+                            @if (!p.EstaCancelado)
+                            {
+                                <div class="acciones">
+                                    <form method="post" asp-action="CambiarEstado" asp-route-id="@p.Id" class="acciones">
+                                        <select class="select" name="estado" style="width:auto">
+                                            @foreach (var e in estados)
+                                            {
+                                                <option value="@e" selected="@(e == p.Estado)">@e</option>
+                                            }
+                                        </select>
+                                        <button class="btn btn--secundario btn--mini" type="submit">Cambiar</button>
+                                    </form>
+                                    <form method="post" asp-action="CancelarPedido" asp-route-id="@p.Id"
+                                          onsubmit="return confirm('Cancelar devuelve el stock. ¿Confirmás?');">
+                                        <input type="hidden" name="motivo" value="Cancelado desde el panel" />
+                                        <button class="btn btn--texto btn--mini" type="submit">Cancelar</button>
+                                    </form>
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

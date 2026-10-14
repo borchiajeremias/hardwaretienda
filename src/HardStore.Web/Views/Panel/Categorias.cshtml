@@ -1,0 +1,47 @@
+@model IReadOnlyList<(Categoria Categoria, int Cantidad)>
+@{
+    ViewData["Titulo"] = "Categorías · Panel";
+}
+<section class="contenedor panel">
+    <h1 class="resultados__titulo">Categorías</h1>
+    @await Html.PartialAsync("_NavPanel")
+
+    <div class="dos-columnas">
+        <div class="tarjeta">
+            <h2 class="tarjeta__titulo">Nueva categoría</h2>
+            <form method="post" asp-action="CrearCategoria" class="form">
+                <div class="campo">
+                    <label for="nombre">Nombre</label>
+                    <input class="input" id="nombre" name="nombre" required maxlength="60" />
+                </div>
+                <div class="campo">
+                    <label for="descripcion">Descripción</label>
+                    <input class="input" id="descripcion" name="descripcion" maxlength="255" />
+                </div>
+                <button class="btn btn--primario btn--bloque" type="submit">Crear</button>
+            </form>
+        </div>
+
+        <div class="tabla-cont">
+            <table class="tabla">
+                <thead><tr><th>Nombre</th><th>Dirección (slug)</th><th class="der">Productos</th><th></th></tr></thead>
+                <tbody>
+                @foreach (var fila in Model)
+                {
+                    <tr>
+                        <td>@fila.Categoria.Nombre</td>
+                        <td><code>@fila.Categoria.Slug</code></td>
+                        <td class="der">@fila.Cantidad</td>
+                        <td>
+                            <form method="post" asp-action="EliminarCategoria" asp-route-id="@fila.Categoria.Id"
+                                  onsubmit="return confirm('¿Eliminar @fila.Categoria.Nombre?');">
+                                <button class="btn btn--texto btn--mini" type="submit">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

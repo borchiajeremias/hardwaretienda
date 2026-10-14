@@ -1,0 +1,111 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = false
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = HardStore.Web
+build_property.RootNamespace = HardStore.Web
+build_property.ProjectDir = F:\HardStore-csharp\HardStore\src\HardStore.Web\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = F:\HardStore-csharp\HardStore\src\HardStore.Web
+build_property._RazorSourceGeneratorDebug = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Checkout/Gracias.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hlY2tvdXRcR3JhY2lhcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Checkout/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hlY2tvdXRcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Cuenta/Ingresar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VlbnRhXEluZ3Jlc2FyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Cuenta/MisPedidos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VlbnRhXE1pc1BlZGlkb3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Cuenta/Registrarse.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VlbnRhXFJlZ2lzdHJhcnNlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Cuenta/SinPermiso.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3VlbnRhXFNpblBlcm1pc28uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Panel/Categorias.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFuZWxcQ2F0ZWdvcmlhcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Panel/Cupones.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFuZWxcQ3Vwb25lcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Panel/FormProducto.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFuZWxcRm9ybVByb2R1Y3RvLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Panel/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFuZWxcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Panel/Pedido.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFuZWxcUGVkaWRvLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Panel/Pedidos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFuZWxcUGVkaWRvcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Panel/Productos.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFuZWxcUHJvZHVjdG9zLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Panel/Promociones.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFuZWxcUHJvbW9jaW9uZXMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Panel/Usuarios.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGFuZWxcVXN1YXJpb3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Shared/_Carrito.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9DYXJyaXRvLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Shared/_NavPanel.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9OYXZQYW5lbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Tienda/Detalle.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGllbmRhXERldGFsbGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Tienda/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGllbmRhXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/Tienda/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGllbmRhXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/HardStore-csharp/HardStore/src/HardStore.Web/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 

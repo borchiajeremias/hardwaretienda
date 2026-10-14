@@ -1,0 +1,181 @@
+@model IReadOnlyList<Promocion>
+@{
+    ViewData["Titulo"] = "Promociones · Panel";
+    var form = ViewBag.Form as PromocionFormVm ?? new PromocionFormVm();
+    var objetivos = ViewBag.Objetivos as Dictionary<int, string> ?? new Dictionary<int, string>();
+}
+<section class="contenedor panel">
+    <h1 class="resultados__titulo">Promociones</h1>
+    @await Html.PartialAsync("_NavPanel")
+
+    <div class="dos-columnas">
+        <div class="tarjeta">
+            <h2 class="tarjeta__titulo">Nueva promoción</h2>
+
+            <form method="post" asp-action="CrearPromocion" class="form">
+                <div class="campo">
+                    <label for="Nombre">Nombre</label>
+                    <input class="input" id="Nombre" name="Nombre" required maxlength="80"
+                           placeholder="3x2 en SSD Kingston" />
+                </div>
+
+                <div class="campo">
+                    <label for="Tipo">Tipo</label>
+                    <select class="select" id="Tipo" name="Tipo" data-tipo>
+                        <option value="LlevaNPagaM">Lleva N y paga M (2x1, 3x2…)</option>
+                        <option value="PorcentajeSobreLinea">Porcentaje de descuento</option>
+                    </select>
+                </div>
+
+                <div class="campo-fila" data-bloque-nxm>
+                    <div class="campo">
+                        <label for="LlevaN">Lleva</label>
+                        <input class="input input--num" id="LlevaN" name="LlevaN" type="number"
+                               min="2" max="20" value="3" />
+                    </div>
+                    <div class="campo">
+                        <label for="PagaM">Paga</label>
+                        <input class="input input--num" id="PagaM" name="PagaM" type="number"
+                               min="1" max="19" value="2" />
+                    </div>
+                </div>
+
+                <div class="campo" data-bloque-porcentaje hidden>
+                    <label for="Porcentaje">Porcentaje de descuento</label>
+                    <input class="input input--num" id="Porcentaje" name="Porcentaje" type="number"
+                           min="1" max="100" step="0.5" value="15" />
+                </div>
+
+                <div class="campo">
+                    <label for="Alcance">Se aplica a</label>
+                    <select class="select" id="Alcance" name="Alcance" data-alcance>
+                        <option value="Producto">Un producto</option>
+                        <option value="Categoria">Toda una categoría</option>
+                    </select>
+                </div>
+
+                <div class="campo" data-bloque-producto>
+                    <label for="ObjetivoProducto">Producto</label>
+                    <select class="select" id="ObjetivoProducto" name="ObjetivoId" data-objetivo-producto>
+                        @foreach (var p in form.Productos)
+                        {
+                            <option value="@p.Id">@p.Codigo — @p.Nombre</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="campo" data-bloque-categoria hidden>
+                    <label for="ObjetivoCategoria">Categoría</label>
+                    <select class="select" id="ObjetivoCategoria" name="ObjetivoIdCategoria" data-objetivo-categoria disabled>
+                        @foreach (var c in form.Categorias)
+                        {
+                            <option value="@c.Id">@c.Nombre</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="campo-fila">
+                    <div class="campo">
+                        <label for="Desde">Desde</label>
+                        <input class="input" id="Desde" name="Desde" type="date"
+                               value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="campo">
+                        <label for="Hasta">Hasta</label>
+                        <input class="input" id="Hasta" name="Hasta" type="date"
+                               value="@DateTime.Today.AddMonths(1).ToString("yyyy-MM-dd")" />
+                    </div>
+                </div>
+
+                <button class="btn btn--primario btn--bloque" type="submit">Crear promoción</button>
+            </form>
+        </div>
+
+        <div class="tabla-cont">
+            <table class="tabla">
+                <thead>
+                    <tr><th>Promo</th><th>Nombre</th><th>Se aplica a</th><th>Vigencia</th><th>Estado</th><th></th></tr>
+                </thead>
+                <tbody>
+                @foreach (var promo in Model)
+                {
+                    <tr>
+                        <td><span class="pill pill--info">@promo.Etiqueta</span></td>
+                        <td>@promo.Nombre</td>
+                        <td>
+                            @(promo.Alcance == AlcancePromocion.Categoria ? "Categoría: " : "Producto: ")
+                            @(objetivos.ContainsKey(promo.Id) ? objetivos[promo.Id] : "—")
+                        </td>
+                        <td>@promo.Desde.ToString("dd/MM/yy") — @promo.Hasta.ToString("dd/MM/yy")</td>
+                        <td>
+                            @if (promo.EstaVigente())
+                            {
+                                <span class="pill pill--ok">Vigente</span>
+                            }
+                            else if (!promo.Activa)
+                            {
+                                <span class="pill">Pausada</span>
+                            }
+                            else
+                            {
+                                <span class="pill pill--alerta">Fuera de fecha</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="acciones">
+                                <form method="post" asp-action="AlternarPromocion" asp-route-id="@promo.Id">
+                                    <button class="btn btn--secundario btn--mini" type="submit">
+                                        @(promo.Activa ? "Pausar" : "Activar")
+                                    </button>
+                                </form>
+                                <form method="post" asp-action="EliminarPromocion" asp-route-id="@promo.Id"
+                                      onsubmit="return confirm('¿Eliminar la promoción?');">
+                                    <button class="btn btn--texto btn--mini" type="submit">Eliminar</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+<script>
+    // Muestra los campos que corresponden al tipo y al alcance elegidos, y se
+    // asegura de que sólo viaje un ObjetivoId al servidor.
+    (function () {
+        const tipo = document.querySelector('[data-tipo]');
+        const alcance = document.querySelector('[data-alcance]');
+        const bloqueNxM = document.querySelector('[data-bloque-nxm]');
+        const bloquePct = document.querySelector('[data-bloque-porcentaje]');
+        const bloqueProd = document.querySelector('[data-bloque-producto]');
+        const bloqueCat = document.querySelector('[data-bloque-categoria]');
+        const selProd = document.querySelector('[data-objetivo-producto]');
+        const selCat = document.querySelector('[data-objetivo-categoria]');
+
+        function actualizar() {
+            const esNxM = tipo.value === 'LlevaNPagaM';
+            bloqueNxM.hidden = !esNxM;
+            bloquePct.hidden = esNxM;
+
+            const esCategoria = alcance.value === 'Categoria';
+            bloqueProd.hidden = esCategoria;
+            bloqueCat.hidden = !esCategoria;
+
+            // El que no se usa se deshabilita: así no manda su valor y el
+            // servidor recibe un solo ObjetivoId.
+            selProd.disabled = esCategoria;
+            selCat.disabled = !esCategoria;
+            selCat.name = esCategoria ? 'ObjetivoId' : 'ObjetivoIdCategoria';
+            selProd.name = esCategoria ? 'ObjetivoIdProducto' : 'ObjetivoId';
+        }
+
+        tipo.addEventListener('change', actualizar);
+        alcance.addEventListener('change', actualizar);
+        actualizar();
+    })();
+</script>
+}

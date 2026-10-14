@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>HardStore.Web</RootNamespace>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+
+  <!--
+    ================================================================
+    DOS MODOS DE PERSISTENCIA
+    ================================================================
+
+    Por defecto (ConEfCore = false) la tienda guarda todo en un archivo
+    JSON usando sólo lo que trae .NET. Ventaja: se clona el proyecto y
+    corre con "dotnet run", sin instalar paquetes ni configurar una base.
+
+    Con ConEfCore = true se compila en su lugar la implementación de
+    Entity Framework Core sobre SQLite, que está en Datos/EfCore/:
+
+        dotnet run  [proyecto src/HardStore.Web]  con  -p:ConEfCore=true
+
+    Eso hace tres cosas: agrega los paquetes de EF Core, define la
+    constante CON_EF_CORE (que es la que habilita el código de
+    Datos/EfCore/ y el bloque correspondiente de Program.cs) e incluye
+    esos archivos en la compilación.
+
+    Los paquetes se bajan de NuGet, así que ese modo necesita internet la
+    primera vez. Si el proyecto se abre en una máquina sin internet, el
+    archivo NuGet.config de la raíz evita que la restauración intente
+    salir a la red — pero entonces sólo funciona el modo JSON.
+
+    Ni los servicios ni los controladores saben cuál de los dos está
+    activo: los dos implementan IAlmacen.
+  -->
+  <PropertyGroup>
+    <ConEfCore Condition="'$(ConEfCore)' == ''">false</ConEfCore>
+  </PropertyGroup>
+
+  <!-- Modo JSON (por defecto): el código de EF Core no se compila. -->
+  <ItemGroup Condition="'$(ConEfCore)' != 'true'">
+    <Compile Remove="Datos/EfCore/**/*.cs" />
+  </ItemGroup>
+
+  <!-- Modo EF Core + SQLite. -->
+  <PropertyGroup Condition="'$(ConEfCore)' == 'true'">
+    <DefineConstants>$(DefineConstants);CON_EF_CORE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(ConEfCore)' == 'true'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

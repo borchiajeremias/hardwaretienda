@@ -1,0 +1,48 @@
+@model IReadOnlyList<Pedido>
+@{
+    ViewData["Titulo"] = "Mis pedidos · HardStore";
+}
+<section class="contenedor" style="padding:var(--s-6) 0">
+    <h1 class="resultados__titulo">Mis pedidos</h1>
+
+    @if (Model.Count == 0)
+    {
+        <p class="vacio">Todavía no hiciste ningún pedido.</p>
+        <p style="text-align:center"><a class="btn btn--primario" asp-controller="Tienda" asp-action="Index">Ver catálogo</a></p>
+    }
+    else
+    {
+        <div class="tabla-cont">
+            <table class="tabla">
+                <thead>
+                    <tr>
+                        <th>Código</th><th>Fecha</th><th class="der">Artículos</th>
+                        <th>Pago</th><th class="der">Total</th><th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td><strong>@p.Codigo</strong></td>
+                        <td>@p.CreadoEn.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td class="der">@p.CantidadDeArticulos</td>
+                        <td>@p.EtiquetaPago</td>
+                        <td class="der">@p.Total.ToString("C2")</td>
+                        <td>
+                            @if (p.EstaCancelado)
+                            {
+                                <span class="pill pill--error">Cancelado</span>
+                            }
+                            else
+                            {
+                                <span class="pill pill--info">@p.Estado</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
